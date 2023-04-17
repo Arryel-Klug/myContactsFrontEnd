@@ -11,6 +11,7 @@ export default styled.select`
   outline: none;
   padding: 0 16px;
   font-size: 16px;
+  appearance: none;
 
   &:focus{
     border-color: ${({ theme }) => theme.colors.primary.main};
