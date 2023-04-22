@@ -1,7 +1,8 @@
+/* eslint-disable no-shadow */
 /* eslint-disable react/jsx-no-bind */
 import PropTypes from 'prop-types';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, ButtonContainer } from './styles';
 import FormGroup from '../FormGroup';
 import Input from '../Input';
@@ -10,18 +11,29 @@ import Button from '../Button';
 import isEmailValid from '../../utils/isEmailValid';
 import formatPhone from '../../utils/formatPhone';
 import useErrors from '../../hooks/useErrors';
+import CategoriesService from '../../services/CategoriesService';
 
 export default function ContactForm({ buttonLabel }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [category, setCategory] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [categories, setCategories] = useState([]);
 
   const {
     setError, removeError, getErrorMessageByFieldName, errors,
   } = useErrors();
 
   const isFormValid = (name && errors.length === 0);
+
+  useEffect(() => {
+    async function loadCategories() {
+      const categoriesList = await CategoriesService.listCategories();
+      setCategories(categoriesList);
+    }
+
+    loadCategories();
+  }, []);
 
   function handleNameChange(event) {
     setName(event.target.value);
@@ -85,12 +97,16 @@ export default function ContactForm({ buttonLabel }) {
 
       <FormGroup>
         <Select
-          value={category}
-          onChange={(event) => setCategory(event.target.value)}
+          value={categoryId}
+          onChange={(event) => setCategoryId(event.target.value)}
         >
-          <option value=""> Categoria</option>
-          <option value="instagram"> Instagram</option>
-          <option value="Discord"> Discord</option>
+          <option value="">Sem Categoria</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+
         </Select>
       </FormGroup>
 
