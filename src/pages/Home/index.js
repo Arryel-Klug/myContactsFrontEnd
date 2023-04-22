@@ -1,47 +1,102 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState, useMemo } from 'react';
 
 import {
-  Container, Header, ListContainer, Card, InputSearchContainer,
+  Container, Header, ListHeader, Card, InputSearchContainer,
 } from './styles';
 
 import arrow from '../../assets/images/icons/arrow.svg';
 import edit from '../../assets/images/icons/edit.svg';
 import trash from '../../assets/images/icons/trash.svg';
+import Loader from '../../components/Loader';
+import ContactsService from '../../services/ContactsService';
 // import Modal from '../../components/Modal';
-// import Loader from '../../components/Loader';
 
 export default function Home() {
+  const [contacts, setContacts] = useState([]);
+  const [orderBy, setOrderBy] = useState('asc');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  const filteredContacts = useMemo(() => contacts.filter((contact) => (
+    contact.name.toUpperCase().includes(searchTerm.toUpperCase())
+  )), [contacts, searchTerm]);
+
+  useEffect(() => {
+    async function loadContacts() {
+      try {
+        setIsLoading(true);
+
+        const contactsList = await ContactsService.listContacts(orderBy);
+
+        setContacts(contactsList);
+      } catch (error) {
+        console.log('Name:', error.name);
+        console.log('Message:', error.message);
+        console.log('Response:', error.response);
+        console.log('Body:', error.body);
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadContacts();
+  }, [orderBy]);
+
+  function handleToggleOrderBy() {
+    setOrderBy(
+      (prevState) => (prevState === 'asc' ? 'desc' : 'asc'),
+    );
+  }
+
+  function handleChangeSearchTerm(event) {
+    setSearchTerm(event.target.value);
+  }
+
   return (
     <Container>
-      {/* <Loader /> */}
+      <Loader isLoading={isLoading} />
 
       {/* <Modal danger /> */}
       <InputSearchContainer>
-        <input type="text" placeholder="Pesquise pelo Nome" />
+        <input
+          value={searchTerm}
+          type="text"
+          placeholder="Pesquise pelo Nome"
+          onChange={handleChangeSearchTerm}
+        />
       </InputSearchContainer>
       <Header>
-        <strong> 3 contatos </strong>
+        <strong>
+          {filteredContacts.length}
+          {filteredContacts.length === 1 ? ' contato' : ' contatos'}
+        </strong>
         <Link to="/new">Novo Contato</Link>
       </Header>
-      <ListContainer>
-        <header>
-          <button type="button">
+
+      {filteredContacts.length > 0 && (
+        <ListHeader orderBy={orderBy}>
+          <button type="button" onClick={handleToggleOrderBy}>
             <span>Nome</span>
             <img src={arrow} alt="Arrow" />
           </button>
-        </header>
-        <Card>
+        </ListHeader>
+      )}
+
+      {filteredContacts.map((contact) => (
+        <Card key={contact.id}>
           <div className="info">
             <div className="contact-name">
-              <strong>Mateus Silva</strong>
-              <small>instagram</small>
+              <strong>{contact.name}</strong>
+              {contact.category_name && (
+                <small>{contact.category_name}</small>)}
             </div>
-            <span>matheus@devacademy.com.br</span>
-            <span>(41) 9999-9999</span>
+            <span>{contact.email}</span>
+            <span>{contact.phone}</span>
           </div>
 
           <div className="actions">
-            <Link to="/edit/123">
+            <Link to={`/edit/${contact.id}`}>
               <img src={edit} alt="Edit" />
             </Link>
             <button type="button">
@@ -49,8 +104,8 @@ export default function Home() {
             </button>
           </div>
         </Card>
+      ))}
 
-      </ListContainer>
     </Container>
   );
 }
