@@ -18,4 +18,9 @@ export default styled.select`
     transition: border-color 0.2s ease-in;
 
   }
+
+  &[disabled]{
+    background-color: ${({ theme }) => theme.colors.gray[100]};
+    border-color: ${({ theme }) => theme.colors.gray[200]};
+  }
 `;
