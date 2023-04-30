@@ -24,8 +24,8 @@ export const StyledButton = styled.button`
   }
 
   &[disabled]{
-    background: #ccc;
-    cursor: default;
+    background: #ccc !important;
+    cursor: default !important;
   }
 
   ${({ theme, danger }) => danger && css`
@@ -40,5 +40,7 @@ export const StyledButton = styled.button`
     }
 
   `}
+
+
 
 `;
