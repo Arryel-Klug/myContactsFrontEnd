@@ -1,3 +1,9 @@
+# myContactsFrontEnd
+
+## Intro
+
+Projeto feito seguindo as aulas do curso JSStack.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
