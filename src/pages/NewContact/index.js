@@ -6,7 +6,7 @@ export default function NewContact() {
   const {
     contactFormRef,
     handleSubmit,
-  } = useNewContact;
+  } = useNewContact();
   return (
     <>
       <PageHeader
