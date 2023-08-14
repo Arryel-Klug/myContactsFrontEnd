@@ -57,7 +57,6 @@ export default function Home() {
 
       {hasContacts && (
         <>
-
           <ContactsList
             filteredContacts={filteredContacts}
             orderBy={orderBy}
